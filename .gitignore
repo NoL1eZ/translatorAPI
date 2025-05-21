@@ -18,6 +18,7 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+db.py
 
 # Virtual Environment
 venv/
@@ -51,3 +52,5 @@ htmlcov/
 
 # Docker
 docker-compose.override.yml
+
+alembic.ini
