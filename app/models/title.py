@@ -9,6 +9,7 @@ class Title(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(200), nullable=False, unique=True)
+    slug = Column(String(200), nullable=False, unique=True, index=True)
     description = Column(Text)
     ongoing = Column(Boolean, default=True)
     assignments = relationship("Assignment", back_populates="title")
