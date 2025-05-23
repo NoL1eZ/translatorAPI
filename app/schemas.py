@@ -1,23 +1,31 @@
 from pydantic import BaseModel
 from typing import List
 
-class Person(BaseModel):
+from app.models.assignments import Assignment
+
+
+class CreatePerson(BaseModel):
     name: str
     discord: str
-    roles: List[int]
 
-class Title(BaseModel):
+class CreateTitle(BaseModel):
     name: str
     description: str | None = None
     ongoing: bool
 
-class Assignment(BaseModel):
+class CreateAssignment(BaseModel):
     title: int
     translator: int
     role: int
 
-class Chapter(BaseModel):
+class CreateChapter(BaseModel):
     number: float
     name: str
     content: str
     status: str
+
+class CreateSubstitution(BaseModel):
+    assignment_id: int
+    substitute_id: int
+    chapter_id: int
+    reason: str | None
