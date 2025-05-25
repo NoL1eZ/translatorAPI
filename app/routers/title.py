@@ -41,9 +41,9 @@ async def create_title(db: Annotated[AsyncSession, Depends(get_db)], create_titl
 
 
 @router.get("/")
-async def get_titles(db: Annotated[AsyncSession, Depends(get_db)], ongoing: bool = True):
+async def get_titles(db: Annotated[AsyncSession, Depends(get_db)], all_ongoing: bool = True):
     query = select(Title)
-    if ongoing:
+    if all_ongoing:
         query = query.where(Title.ongoing == True)
     result = await db.scalars(query)
     return result.all()

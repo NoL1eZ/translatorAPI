@@ -15,7 +15,7 @@ class CreateTitle(BaseModel):
 
 class CreateAssignment(BaseModel):
     title: int
-    translator: int
+    person: int
     role: int
 
 class CreateChapter(BaseModel):

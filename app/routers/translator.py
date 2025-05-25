@@ -2,14 +2,12 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from typing import Annotated
 from sqlalchemy import insert, update, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 
 from app.backend.db_depends import get_db
 from app.schemas import CreatePerson
 from app.models.translator import Person, Role
 from app.models.assignments import Assignment
-from app.models.title import Title
 from app.models.substitution import Substitution
 
 
@@ -113,7 +111,7 @@ async def get_person_assignments(db: Annotated[AsyncSession, Depends(get_db)], d
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Person not found'
         )
-    # Get assignments with a single query
+
     assignments = await db.scalars(select(Assignment).where(Assignment.person_id == person.id))
 
     return assignments.all()
