@@ -31,22 +31,34 @@ async def create_substitution(db: Annotated[AsyncSession, Depends(get_db)], data
 async def get_chapter_substitutions(db: Annotated[AsyncSession, Depends(get_db)], title_slug: str, chapter_id: int):
     chapter = await search_chapter(db, title_slug, chapter_id)
     if chapter is None:
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Chapter not found'
         )
     substitution = await db.execute(select(Substitution).where(Substitution.chapter_id == chapter_id))
-    result = substitution.all()
+    result = substitution.scalars().all()
     return result
 
 
 
 
-@router.get("/assignments/{assignment_id}")
+@router.delete("/assignments/{assignment_id}")
 async def delete_substitutions(db: Annotated[AsyncSession, Depends(get_db)], substitution_id: int):
-    substitution = await db.execute(select(Substitution).where(Substitution.id == substitution_id))
+    result = await db.execute(
+        select(Substitution).where(Substitution.id == substitution_id)
+    )
+    substitution = result.scalar_one_or_none()
+
+    if substitution is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Substitution not found"
+        )
+
     await db.delete(substitution)
-    pass
+    await db.commit()
+
+    return {"detail": "Substitution deleted successfully"}
 
 
 

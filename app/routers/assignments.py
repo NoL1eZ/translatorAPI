@@ -27,7 +27,7 @@ async def create_assignment(db: Annotated[AsyncSession, Depends(get_db)], data: 
 
 @router.get("/titles/{title_slug}")
 async def get_title_assignments(db: Annotated[AsyncSession, Depends(get_db)], title_slug: str):
-    title = search_title(db, title_slug)
+    title = await search_title(db, title_slug)
     if title is None:
         raise HTTPException(
             status_code=status.HTTP_200_OK,
@@ -35,16 +35,22 @@ async def get_title_assignments(db: Annotated[AsyncSession, Depends(get_db)], ti
         )
 
     assignments = await db.execute(select(Assignment).where(Assignment.title_id == title.id))
-    result = assignments.all()
+    result = assignments.scalars().all()
     return result
 
 
 @router.delete("/{assignment_id}")
 async def delete_assignment(db: Annotated[AsyncSession, Depends(get_db)], assignment_id: int):
-    assignments = await db.execute(select(Assignment).where(Assignment.id == assignment_id))
+    result = await db.execute(select(Assignment).where(Assignment.id == assignment_id))
+    assignment = result.scalar_one_or_none()
 
-    await db.delete(assignments)
-    pass
+    if assignment is None:
+        raise HTTPException(status_code=404, detail="Assignment not found")
+
+    await db.delete(assignment)
+    await db.commit()
+
+    return {"detail": "Assignment deleted successfully"}
 
 
 

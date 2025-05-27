@@ -16,15 +16,30 @@ async def search_chapter(db: Annotated[AsyncSession, Depends(get_db)], title_slu
     return await db.scalar(select(Chapter).join(Title).where(Title.slug == title_slug, Chapter.id == chapter_id))
 
 @router.post("/")
-async def create_chapter(db: Annotated[AsyncSession, Depends(get_db)], data: CreateChapter, title_slug: str):
+async def create_chapter(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    data: CreateChapter,
+    title_slug: str
+):
+    # Найти тайтл по slug
+    result = await db.execute(select(Title).where(Title.slug == title_slug))
+    title = result.scalar_one_or_none()
 
-    chapter = Chapter(number = data.number,
-                      name = data.name,
-                      content = data.content,
-                      status = data.status)
+    if not title:
+        raise HTTPException(status_code=404, detail="Title not found")
+
+    # Создать главу с title_id
+    chapter = Chapter(
+        title_id=title.id,  # <-- ОБЯЗАТЕЛЬНО
+        number=data.number,
+        name=data.name,
+        content=data.content,
+        status=data.status
+    )
 
     db.add(chapter)
     await db.commit()
+
     return {
         'status_code': status.HTTP_201_CREATED,
         'transaction': 'Successful'
@@ -33,15 +48,17 @@ async def create_chapter(db: Annotated[AsyncSession, Depends(get_db)], data: Cre
 
 @router.get("/")
 async def get_chapters(db: Annotated[AsyncSession, Depends(get_db)], title_slug: str, chapter_status: str = None):
-    chapter = select(Chapter).join(Title).where(Title.slug == title_slug)
+    query = select(Chapter).join(Title).where(Title.slug == title_slug)
     if chapter_status is not None:
-        chapter = chapter.where(Chapter.status == chapter_status)
-    chapters = await db.scalar(chapter)
-    result = chapters.all()
-    if result:
-        return result
+        query = query.where(Chapter.status == chapter_status)
+
+    result = await db.scalars(query)
+    chapters = result.all()
+
+    if chapters:
+        return chapters
     else:
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Chapters not found'
         )

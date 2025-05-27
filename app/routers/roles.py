@@ -9,7 +9,7 @@ from app.models.translator import Role
 
 router = APIRouter(prefix="/roles", tags=["roles"])
 
-async def search_title(db: Annotated[AsyncSession, Depends(get_db)], name: str):
+async def search_role(db: Annotated[AsyncSession, Depends(get_db)], name: str):
     role = await db.scalar(select(Role).where(Role.name == name))
     if role:
         return role
@@ -20,11 +20,11 @@ async def search_title(db: Annotated[AsyncSession, Depends(get_db)], name: str):
 @router.post("/")
 async def create_role(db: Annotated[AsyncSession, Depends(get_db)], role_data: CreateRole):
 
-    role = search_role(db, role_data.name)
+    role = await search_role(db, role_data.name)  # Await here
     if role:
         raise HTTPException(status_code=200, detail="Role already exists")
 
-    db_role = Role(name=role_data.name,archive= False)
+    db_role = Role(name=role_data.name, archive=False)
     db.add(db_role)
     await db.commit()
     return {
