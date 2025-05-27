@@ -1,17 +1,20 @@
-# Используем официальный образ Python
+# Используем Python 3.12
 FROM python:3.12
 
-#
-WORKDIR /translatorapi
+# Устанавливаем рабочую директорию внутри контейнера
+WORKDIR /app
 
-#
-COPY ./requirements.txt /translatorapi/requirements.txt
+# Копируем файл с зависимостями
+COPY requirements.txt .
 
-#
-RUN pip install --no-cache-dir --upgrade -r /translatorapi/requirements.txt
+# Устанавливаем зависимости
+RUN pip install --no-cache-dir -r requirements.txt
 
-#
-COPY ./app /translatorapi/app
+# Копируем остальной проект
+COPY . .
 
-# Указываем правильный путь к приложению
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Открываем порт 8000
+EXPOSE 8000
+
+# Запуск приложения через uvicorn
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
