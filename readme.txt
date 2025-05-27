@@ -1,3 +1,14 @@
+0. В самом начале создайте БД postgreSQL и настройте файл .env в корне проекта
+
+Примерное наполнение:
+
+DB_USER=postgres
+DB_PASSWORD=secret
+DB_NAME=mydatabase
+DB_HOST=localhost
+DB_PORT=5432
+
+
 1. Общее описание
 
     Назначение API: Система учета переводов манги/ранобэ с учетом ролей, подмен и глав.
@@ -36,6 +47,12 @@ cp .env.example .env
 
 # Запуск
 uvicorn app.main:app --reload
+
+# Запуск через докер
+
+docker build -t translator-api .
+docker run -d -p 8000:8000 translator-api
+
 
 5 Эндпоинты
 
