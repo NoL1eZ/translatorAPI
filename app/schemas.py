@@ -14,9 +14,9 @@ class CreateTitle(BaseModel):
     ongoing: bool = True
 
 class CreateAssignment(BaseModel):
-    title: int
-    person: int
-    role: int
+    title_id: int
+    person_id: int
+    role_id: int
 
 class CreateChapter(BaseModel):
     number: float

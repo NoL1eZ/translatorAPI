@@ -15,9 +15,9 @@ router = APIRouter(prefix="/assignments", tags=["assignments"])
 
 @router.post("/")
 async def create_assignment(db: Annotated[AsyncSession, Depends(get_db)], data: CreateAssignment):
-    assignments =  Assignment(title = data.title,
-                                   person = data.person,
-                                   role = data.role)
+    assignments =  Assignment(title_id = data.title_id,
+                                   person_id = data.person_id,
+                                   role_id = data.role_id)
     db.add(assignments)
     await db.commit()
     return {
